@@ -1,0 +1,231 @@
+<style>
+    .text-slider {
+        max-width: 600px;
+        margin: 0 auto;
+        background: yellow;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .text-slider__fixed {
+        width: fit-content;
+        margin: 0 auto;
+    }
+
+    .text-slider__track {
+        display: flex;
+        flex-direction: row;
+        gap: 35px;
+        width: fit-content;
+        position: relative;
+        transition: transform 1s ease-in-out;
+    }
+
+    .text-slider__item {
+        white-space: nowrap;
+        transition: opacity 0.3s ease;
+    }
+
+    .text-slider__item--active {
+        color: red;
+    }
+</style>
+
+<div class="text-slider" data-text-slider data-interval="2000" data-gap="35">
+    <div class="text-slider__fixed">
+        What you did last BFCM
+    </div>
+    <div class="text-slider__track">
+        <div class="text-slider__item">Deep discounts</div>
+        <div class="text-slider__item">More email campaigns</div>
+        <div class="text-slider__item">Higher ad spend</div>
+        <div class="text-slider__item">Hope visitors convert</div>
+    </div>
+</div>
+
+<script>
+    /**
+     * Text Slider Animation
+     * Tạo hiệu ứng slider text chạy ngang với infinite loop
+     */
+    class TextSlider {
+        constructor(element, options = {}) {
+            this.container = element;
+            this.interval = options.interval || 1000;
+            this.transitionDuration = options.transitionDuration || 1000;
+            this.clonedCount = options.clonedCount || 3;
+            this.gap = options.gap || 20;
+
+            this.fixedElement = this.container.querySelector('.text-slider__fixed');
+            this.track = this.container.querySelector('.text-slider__track');
+            this.originalItems = Array.from(this.container.querySelectorAll('.text-slider__item'));
+
+            this.currentIndex = 0;
+            this.allItems = [];
+            this.initialOffset = 0;
+            this.intervalId = null;
+
+            this.init();
+        }
+
+        init() {
+            this.setupInfiniteLoop();
+            setTimeout(() => {
+                this.calculateInitialPosition();
+                this.start();
+            }, 10);
+        }
+
+        setupInfiniteLoop() {
+            // Clone các phần tử cuối lên đầu để tạo hiệu ứng loop
+            for (let i = this.originalItems.length - 1; i >= this.originalItems.length - this.clonedCount; i--) {
+                const clone = this.originalItems[i].cloneNode(true);
+                this.track.insertBefore(clone, this.track.firstChild);
+            }
+
+            // Clone tất cả phần tử gốc ra cuối
+            this.originalItems.forEach(item => {
+                const clone = item.cloneNode(true);
+                this.track.appendChild(clone);
+            });
+
+            this.allItems = Array.from(this.track.querySelectorAll('.text-slider__item'));
+            this.currentIndex = this.clonedCount;
+        }
+
+        calculateInitialPosition() {
+            const fixedRect = this.fixedElement.getBoundingClientRect();
+            const containerRect = this.container.getBoundingClientRect();
+            const fixedLeftOffset = fixedRect.left - containerRect.left;
+
+            let offsetX = 0;
+            for (let i = 0; i < this.currentIndex; i++) {
+                const rect = this.allItems[i].getBoundingClientRect();
+                offsetX += rect.width + this.gap;
+            }
+            offsetX -= fixedLeftOffset;
+
+            this.initialOffset = offsetX;
+
+            this.track.style.transition = 'none';
+            this.track.style.transform = `translateX(-${offsetX}px)`;
+            this.updateActiveState();
+
+            setTimeout(() => {
+                this.track.style.transition = `transform ${this.transitionDuration / 1000}s ease-in-out`;
+            }, 50);
+        }
+
+        getOffset(index) {
+            const fixedRect = this.fixedElement.getBoundingClientRect();
+            const containerRect = this.container.getBoundingClientRect();
+            const fixedLeftOffset = fixedRect.left - containerRect.left;
+
+            let offsetX = 0;
+            for (let i = 0; i < index; i++) {
+                const rect = this.allItems[i].getBoundingClientRect();
+                offsetX += rect.width + this.gap;
+            }
+            offsetX -= fixedLeftOffset;
+
+            return offsetX;
+        }
+
+        updateActiveState() {
+            // Xóa active khỏi tất cả items
+            this.allItems.forEach(item => item.classList.remove('text-slider__item--active'));
+
+            // Thêm active vào item hiện tại
+            if (this.allItems[this.currentIndex]) {
+                this.allItems[this.currentIndex].classList.add('text-slider__item--active');
+            }
+        }
+
+        getTransitionDuration() {
+            // Phần tử đầu tiên (sau khi reset) - chuyển ngay lập tức
+            if (this.currentIndex === this.clonedCount) {
+                return 0;
+            }
+            // Các phần tử khác (bao gồm cả phần tử cuối)
+            return this.transitionDuration;
+        }
+
+        animate() {
+            this.currentIndex++;
+
+            // Kiểm tra vượt quá giới hạn
+            if (this.currentIndex > this.clonedCount + this.originalItems.length) {
+                this.track.style.transition = 'none';
+                this.currentIndex = this.clonedCount;
+                this.updateActiveState();
+                setTimeout(() => {
+                    const duration = this.getTransitionDuration();
+                    this.track.style.transition = `transform ${duration / 1000}s ease-in-out`;
+                }, 50);
+                return;
+            }
+
+            // Lấy thời gian transition cho phần tử hiện tại
+            const duration = this.getTransitionDuration();
+            this.track.style.transition = `transform ${duration / 1000}s ease-in-out`;
+
+            const offsetX = this.getOffset(this.currentIndex);
+            this.track.style.transform = `translateX(-${offsetX}px)`;
+            this.updateActiveState();
+
+            // Reset khi đến cuối
+            if (this.currentIndex === this.clonedCount + this.originalItems.length) {
+                setTimeout(() => {
+                    this.track.style.transition = 'none';
+                    this.currentIndex = this.clonedCount;
+                    const resetOffset = this.getOffset(this.currentIndex);
+                    this.track.style.transform = `translateX(-${resetOffset}px)`;
+                    this.updateActiveState();
+
+                    setTimeout(() => {
+                        const nextDuration = this.getTransitionDuration();
+                        this.track.style.transition = `transform ${nextDuration / 1000}s ease-in-out`;
+                    }, 50);
+                }, duration);
+            }
+        }
+
+        start() {
+            if (this.intervalId) return;
+            this.intervalId = setInterval(() => this.animate(), this.interval);
+        }
+
+        stop() {
+            if (this.intervalId) {
+                clearInterval(this.intervalId);
+                this.intervalId = null;
+            }
+        }
+
+        destroy() {
+            this.stop();
+        }
+    }
+
+    // Auto init tất cả text sliders trên trang
+    document.addEventListener('DOMContentLoaded', () => {
+        const sliders = document.querySelectorAll('[data-text-slider]');
+        sliders.forEach(slider => {
+            const interval = parseInt(slider.dataset.interval) || 1000;
+            const gap = parseInt(slider.dataset.gap) || 20;
+            new TextSlider(slider, { interval, gap });
+        });
+    });
+
+    // Nếu DOM đã load rồi thì init ngay
+    if (document.readyState === 'loading') {
+        // Đã có event listener ở trên
+    } else {
+        const sliders = document.querySelectorAll('[data-text-slider]');
+        sliders.forEach(slider => {
+            const interval = parseInt(slider.dataset.interval) || 1000;
+            const gap = parseInt(slider.dataset.gap) || 20;
+            new TextSlider(slider, { interval, gap });
+        });
+    }
+</script>
