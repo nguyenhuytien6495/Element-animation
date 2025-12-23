@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Sliding Animation - Final Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .optimize-text {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.3;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        /* Wrapper giữ kích thước */
+        .text-slider-wrapper {
+            display: inline-block;
+            position: relative;
+            vertical-align: top;
+        }
+
+        /* Container chứa tất cả text items */
+        #animation-text-tranfrom-up {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Gradient class */
+        .text-brand-gradient,
+        .text-brand-gradient .text-item {
+            background: linear-gradient(90deg, #06038D 0.16%, #FF7675 100.1%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Frame display - khung hiển thị (invisible nhưng giữ kích thước) */
+        .text-item.frame-display {
+            position: relative;
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Các text items khác - absolute và xếp chồng */
+        .text-item:not(.frame-display) {
+            position: absolute;
+            top: 0;
+            left: 0;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(100%);
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1;
+        }
+
+        /* Text item đang active */
+        .text-item.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Text item đang slide out */
+        .text-item.slide-out {
+            opacity: 0;
+            transform: translateY(-100%);
+        }
+
+        /* Text item đang slide in */
+        .text-item.slide-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-top: 20px;
+        }
+
+        .controls {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #92400e;
+        }
+
+        .debug {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: monospace;
+            color: #374151;
+        }
+
+        @media (max-width: 768px) {
+            .optimize-text {
+                font-size: 36px;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="badge">
+            Empower Shopify Growth
+        </div>
+
+        <div class="optimize-text">
+            Optimize
+            <span class="text-slider-wrapper">
+                <span id="animation-text-tranfrom-up" class="text-brand-gradient">
+                    <span class="text-item frame-display">Acquisition</span>
+                    <span class="text-item slide-in active" data-index="0">Retention</span>
+                    <span class="text-item" data-index="1">Acquisition</span>
+                    <span class="text-item" data-index="2">Conversion</span>
+                </span>
+            </span>
+            <br />for Max ROI
+        </div>
+
+        <div class="subtitle">
+            Sell More, Stress Less: Avada Commerce's Reliable Apps Streamline Your Customer Path for Consistent ROI
+            Growth
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="restartBtn">🔄 Restart</button>
+            <button class="btn btn-secondary" id="pauseBtn">⏸️ Pause</button>
+            <button class="btn btn-secondary" id="speedUpBtn">⚡ Speed Up</button>
+            <button class="btn btn-secondary" id="slowDownBtn">🐌 Slow Down</button>
+        </div>
+
+        <div class="info">
+            💡 <strong>Tip:</strong> Hover chuột lên text để tạm dừng animation! Tốc độ: <span id="speedInfo">3.
+                0s</span>
+        </div>
+
+        <div class="debug">
+            📊 Current: <span id="debugCurrent">Retention</span> |
+            Next: <span id="debugNext">Acquisition</span> |
+            Status: <span id="debugStatus">Running</span>
+        </div>
+    </div>
+
+    <script>
+        class TextSliderAnimation {
+            constructor(containerId, interval = 3000) {
+                this.container = document.getElementById(containerId);
+                this.items = Array.from(this.container.querySelectorAll('.text-item:not(.frame-display)'));
+                this.interval = interval;
+                this.currentIndex = 0;
+                this.isAnimating = false;
+                this.isPaused = false;
+                this.animationInterval = null;
+
+                // Tính toán width lớn nhất để set cho frame-display
+                this.setFrameWidth();
+                this.init();
+            }
+
+            setFrameWidth() {
+                const frameDisplay = this.container.querySelector('.frame-display');
+                let maxWidth = 0;
+
+                // Tạm thời hiển thị tất cả items để đo width
+                this.items.forEach(item => {
+                    const tempDisplay = item.style.display;
+                    const tempPosition = item.style.position;
+                    const tempOpacity = item.style.opacity;
+
+                    item.style.position = 'relative';
+                    item.style.opacity = '1';
+                    item.style.display = 'inline-block';
+
+                    const width = item.offsetWidth;
+                    if (width > maxWidth) {
+                        maxWidth = width;
+                        frameDisplay.textContent = item.textContent;
+                    }
+
+                    item.style.display = '';
+                    item.style.position = tempPosition;
+                    item.style.opacity = tempOpacity;
+                });
+            }
+
+            init() {
+                // Set item đầu tiên là active
+                this.items[0].classList.add('active');
+                this.updateDebug();
+                this.start();
+            }
+
+            start() {
+                if (this.animationInterval) {
+                    clearInterval(this.animationInterval);
+                }
+
+                this.isPaused = false;
+                this.animationInterval = setInterval(() => {
+                    this.animate();
+                }, this.interval);
+
+                this.updateDebug();
+            }
+
+            animate() {
+                if (this.isAnimating || this.isPaused) return;
+
+                this.isAnimating = true;
+
+                const currentItem = this.items[this.currentIndex];
+                const nextIndex = (this.currentIndex + 1) % this.items.length;
+                const nextItem = this.items[nextIndex];
+
+                // Current item: slide out (lên trên + mờ dần)
+                currentItem.classList.remove('active', 'slide-in');
+                currentItem.classList.add('slide-out');
+
+                // Next item: đặt vị trí ban đầu (dưới) với inline style để force initial state
+                nextItem.classList.remove('slide-out', 'active', 'slide-in');
+                nextItem.style.transform = 'translateY(100%)';
+                nextItem.style.opacity = '0';
+
+                // Trigger animation - slide in (từ dưới lên + hiện rõ dần)
+                setTimeout(() => {
+                    nextItem.style.transform = '';
+                    nextItem.style.opacity = '';
+                    nextItem.classList.add('slide-in', 'active');
+                }, 50);
+
+                // Cleanup sau khi animation xong
+                setTimeout(() => {
+                    currentItem.classList.remove('slide-out');
+                    currentItem.style.transform = '';
+                    currentItem.style.opacity = '';
+
+                    this.currentIndex = nextIndex;
+                    this.isAnimating = false;
+                    this.updateDebug();
+                }, 600);
+            }
+
+            pause() {
+                this.isPaused = true;
+                document.getElementById('debugStatus').textContent = 'Paused';
+            }
+
+            resume() {
+                this.isPaused = false;
+                document.getElementById('debugStatus').textContent = 'Running';
+            }
+
+            stop() {
+                if (this.animationInterval) {
+                    clearInterval(this.animationInterval);
+                }
+                this.isPaused = true;
+                document.getElementById('debugStatus').textContent = 'Stopped';
+            }
+
+            restart() {
+                this.stop();
+
+                // Reset tất cả items
+                this.items.forEach((item, index) => {
+                    item.classList.remove('active', 'slide-out', 'slide-in');
+                    item.style.transform = '';
+                    item.style.opacity = '';
+                });
+
+                // Active item đầu tiên
+                this.currentIndex = 0;
+                this.items[0].classList.add('active');
+
+                this.start();
+                this.updateDebug();
+            }
+
+            setSpeed(interval) {
+                this.interval = interval;
+                if (!this.isPaused) {
+                    this.start();
+                }
+                document.getElementById('speedInfo').textContent = (interval / 1000).toFixed(1) + 's';
+            }
+
+            updateDebug() {
+                const currentText = this.items[this.currentIndex].textContent;
+                const nextIndex = (this.currentIndex + 1) % this.items.length;
+                const nextText = this.items[nextIndex].textContent;
+
+                document.getElementById('debugCurrent').textContent = currentText;
+                document.getElementById('debugNext').textContent = nextText;
+            }
+        }
+
+        // Khởi tạo
+        let slider;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            slider = new TextSliderAnimation('animation-text-tranfrom-up', 3000);
+
+            // Hover to pause
+            const wrapper = document.querySelector('.text-slider-wrapper');
+            wrapper.addEventListener('mouseenter', () => slider.pause());
+            wrapper.addEventListener('mouseleave', () => slider.resume());
+
+            // Controls
+            document.getElementById('restartBtn').addEventListener('click', () => {
+                slider.restart();
+                document.getElementById('pauseBtn').innerHTML = '⏸️ Pause';
+            });
+
+            document.getElementById('pauseBtn').addEventListener('click', (e) => {
+                if (slider.isPaused && slider.animationInterval === null) {
+                    slider.start();
+                    e.target.innerHTML = '⏸️ Pause';
+                } else if (slider.isPaused) {
+                    slider.resume();
+                    e.target.innerHTML = '⏸️ Pause';
+                } else {
+                    slider.pause();
+                    e.target.innerHTML = '▶️ Resume';
+                }
+            });
+
+            document.getElementById('speedUpBtn').addEventListener('click', () => {
+                const newSpeed = Math.max(1000, slider.interval - 500);
+                slider.setSpeed(newSpeed);
+            });
+
+            document.getElementById('slowDownBtn').addEventListener('click', () => {
+                const newSpeed = Math.min(5000, slider.interval + 500);
+                slider.setSpeed(newSpeed);
+            });
+        });
+    </script>
+</body>
+
+</html>
