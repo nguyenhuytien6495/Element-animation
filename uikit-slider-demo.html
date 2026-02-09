@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UIKit Slider Demo - Testimonials</title>
+
+    <!-- UIKit CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/uikit@3.25.8/dist/css/uikit.min.css"
+    />
+
+    <style>
+      :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --card-bg: #1a1a2e;
+        --text-color: #ffffff;
+        --text-muted: #a0aec0;
+        --star-color: #fbc80b;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      /* Section Title */
+      .section-title {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .section-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+      }
+
+      .section-title p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+      }
+
+      /* Slider Container */
+      .testimonial-slider {
+        position: relative;
+        padding: 0 60px;
+      }
+
+      /* Card Item Styles */
+      .card-item {
+        background: var(--card-bg);
+        border-radius: 24px;
+        padding: 30px;
+        margin: 20px 10px;
+        width: 400px !important;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        transform: scale(0.85);
+        opacity: 0.6;
+      }
+
+      /* Left Slide - scale nhỏ, opacity thấp */
+      .slide-item-left .card-item {
+        transform: scale(0.85) translateX(20px);
+        opacity: 0.5;
+        border-color: rgba(255, 255, 255, 0.05);
+      }
+
+      /* Center Slide - scale lớn, opacity cao, highlight */
+      .slide-item-center .card-item {
+        transform: scale(1.05);
+        opacity: 1;
+        border-color: var(--primary-color);
+        box-shadow:
+          0 35px 60px -12px rgba(102, 126, 234, 0.4),
+          0 0 40px rgba(102, 126, 234, 0.2);
+      }
+
+      /* Right Slide - scale nhỏ, opacity thấp */
+      .slide-item-right .card-item {
+        transform: scale(0.85) translateX(-20px);
+        opacity: 0.5;
+        border-color: rgba(255, 255, 255, 0.05);
+      }
+
+      /* Các slide khác (xa hơn) */
+      .slide-item-far .card-item {
+        transform: scale(0.75);
+        opacity: 0.3;
+      }
+
+      /* Hover effect chỉ áp dụng cho center slide */
+      .slide-item-center .card-item:hover {
+        transform: scale(1.08) translateY(-5px);
+        box-shadow:
+          0 40px 70px -12px rgba(102, 126, 234, 0.5),
+          0 0 50px rgba(102, 126, 234, 0.3);
+      }
+
+      /* Image Container */
+      .actual-results-image {
+        width: 100%;
+        overflow: hidden;
+        border-radius: 16px;
+        margin-bottom: 25px;
+      }
+
+      .actual-results-image img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 16px;
+        transition: transform 0.5s ease;
+      }
+
+      .card-item:hover .actual-results-image img {
+        transform: scale(1.05);
+      }
+
+      /* Content Styles */
+      .actual-results-content {
+        color: var(--text-color);
+        font-size: 1rem;
+        line-height: 1.7;
+        font-style: italic;
+        margin-bottom: 25px;
+        position: relative;
+        padding-left: 25px;
+      }
+
+      .actual-results-content::before {
+        content: '"';
+        position: absolute;
+        left: 0;
+        top: -10px;
+        font-size: 3rem;
+        color: var(--primary-color);
+        font-family: Georgia, serif;
+        line-height: 1;
+      }
+
+      /* Info Section */
+      .actual-results-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .actual-results-info_name .el-title {
+        color: var(--text-color);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .actual-results-info_name .el-meta {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+
+      .actual-results-info_result .el-title {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
+      }
+
+      .actual-results-info_result .el-meta {
+        color: var(--text-color);
+        font-size: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 5px;
+      }
+
+      .actual-results-info_result .el-meta span {
+        display: flex;
+        gap: 3px;
+      }
+
+      /* Navigation Arrows */
+      .slider-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 10;
+      }
+
+      .slider-nav:hover {
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      }
+
+      .slider-nav-prev {
+        left: 0;
+      }
+
+      .slider-nav-next {
+        right: 0;
+      }
+
+      .slider-nav svg {
+        color: white;
+      }
+
+      /* Dots Navigation */
+      .uk-slider-nav {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .uk-slider-nav li a {
+        width: 12px;
+        height: 12px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+      }
+
+      .uk-slider-nav li.uk-active a {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        width: 30px;
+        border-radius: 10px;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .card-item {
+          width: 320px !important;
+          padding: 20px;
+        }
+
+        .testimonial-slider {
+          padding: 0 20px;
+        }
+
+        .section-title h2 {
+          font-size: 1.8rem;
+        }
+
+        .slider-nav {
+          width: 40px;
+          height: 40px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Section Title -->
+      <div class="section-title">
+        <h2>What Our Customers Say</h2>
+        <p>Real results from real people using our platform</p>
+      </div>
+
+      <!-- Slider -->
+      <div
+        class="testimonial-slider"
+        uk-slider="center: true; autoplay: true; autoplay-interval: 5000; pause-on-hover: true; finite: false"
+      >
+        <!-- Slider Items -->
+        <div class="uk-slider-items uk-grid uk-grid-small">
+          <!-- Card 1 -->
+          <div>
+            <div class="card-item">
+              <div class="actual-results-image">
+                <img
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop"
+                  alt="Customer 1"
+                  loading="lazy"
+                />
+              </div>
+
+              <div class="actual-results-content">
+                The real-time insights and easy-to-use interface make it an
+                indispensable tool for my daily trading
+              </div>
+
+              <div class="actual-results-info">
+                <div class="actual-results-info_name">
+                  <div class="el-title">Sienna Cruz</div>
+                  <div class="el-meta">Student</div>
+                </div>
+                <div class="actual-results-info_result">
+                  <div class="el-title">Grade</div>
+                  <div class="el-meta">
+                    5.0
+                    <span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div>
+            <div class="card-item">
+              <div class="actual-results-image">
+                <img
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+                  alt="Customer 2"
+                  loading="lazy"
+                />
+              </div>
+
+              <div class="actual-results-content">
+                An exceptional platform that has revolutionized my approach to
+                learning and personal development
+              </div>
+
+              <div class="actual-results-info">
+                <div class="actual-results-info_name">
+                  <div class="el-title">Marcus Chen</div>
+                  <div class="el-meta">Professional Trader</div>
+                </div>
+                <div class="actual-results-info_result">
+                  <div class="el-title">Grade</div>
+                  <div class="el-meta">
+                    4.8
+                    <span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div>
+            <div class="card-item">
+              <div class="actual-results-image">
+                <img
+                  src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop"
+                  alt="Customer 3"
+                  loading="lazy"
+                />
+              </div>
+
+              <div class="actual-results-content">
+                The best investment I've made in my career. The insights are
+                incredibly accurate and actionable
+              </div>
+
+              <div class="actual-results-info">
+                <div class="actual-results-info_name">
+                  <div class="el-title">Emily Watson</div>
+                  <div class="el-meta">Entrepreneur</div>
+                </div>
+                <div class="actual-results-info_result">
+                  <div class="el-title">Grade</div>
+                  <div class="el-meta">
+                    5.0
+                    <span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div>
+            <div class="card-item">
+              <div class="actual-results-image">
+                <img
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop"
+                  alt="Customer 4"
+                  loading="lazy"
+                />
+              </div>
+
+              <div class="actual-results-content">
+                Game-changing platform with intuitive design. My productivity
+                has increased by 200% since I started using it
+              </div>
+
+              <div class="actual-results-info">
+                <div class="actual-results-info_name">
+                  <div class="el-title">David Miller</div>
+                  <div class="el-meta">Software Engineer</div>
+                </div>
+                <div class="actual-results-info_result">
+                  <div class="el-title">Grade</div>
+                  <div class="el-meta">
+                    4.9
+                    <span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="12"
+                        viewBox="0 0 13 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M5.82804 0.191307C5.91092 -0.0637779 6.2718 -0.0637775 6.35468 0.191307L7.60289 4.0329C7.63995 4.14698 7.74626 4.22422 7.86621 4.22422H11.9055C12.1737 4.22422 12.2852 4.56743 12.0682 4.72508L8.80038 7.09932C8.70335 7.16982 8.66274 7.29479 8.69981 7.40887L9.94802 11.2505C10.0309 11.5055 9.73894 11.7177 9.52195 11.56L6.2541 9.18578C6.15706 9.11527 6.02566 9.11527 5.92862 9.18578L2.66076 11.56C2.44377 11.7177 2.15182 11.5055 2.2347 11.2505L3.48291 7.40887C3.51998 7.29479 3.47937 7.16982 3.38233 7.09932L0.114474 4.72508C-0.102514 4.56743 0.0090034 4.22422 0.277215 4.22422H4.31651C4.43645 4.22422 4.54276 4.14698 4.57983 4.0329L5.82804 0.191307Z"
+                          fill="#FBC80B"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Arrows -->
+        <button class="slider-nav slider-nav-prev" uk-slider-item="previous">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <button class="slider-nav slider-nav-next" uk-slider-item="next">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+
+        <!-- Dots Navigation -->
+        <ul class="uk-slider-nav uk-dotnav uk-flex-center uk-margin"></ul>
+      </div>
+    </div>
+
+    <!-- UIKit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.25.8/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.25.8/dist/js/uikit-icons.min.js"></script>
+
+    <script>
+      // Custom Slider Position Classes
+      (function () {
+        const sliderEl = document.querySelector(".testimonial-slider");
+        if (!sliderEl) return;
+
+        // Hàm cập nhật position classes
+        function updateSlidePositions(centerIndex) {
+          const slides = sliderEl.querySelectorAll(".uk-slider-items > div");
+          const totalSlides = slides.length;
+
+          slides.forEach((slide, index) => {
+            // Xóa tất cả position classes
+            slide.classList.remove(
+              "slide-item-left",
+              "slide-item-center",
+              "slide-item-right",
+              "slide-item-far",
+            );
+
+            // Tính toán vị trí relative so với center (có xử lý infinite loop)
+            let relativePos = index - centerIndex;
+
+            // Xử lý wrap around cho infinite slider
+            if (relativePos > totalSlides / 2) {
+              relativePos -= totalSlides;
+            } else if (relativePos < -totalSlides / 2) {
+              relativePos += totalSlides;
+            }
+
+            // Thêm class dựa trên vị trí
+            if (relativePos === 0) {
+              slide.classList.add("slide-item-center");
+            } else if (relativePos === -1) {
+              slide.classList.add("slide-item-left");
+            } else if (relativePos === 1) {
+              slide.classList.add("slide-item-right");
+            } else {
+              slide.classList.add("slide-item-far");
+            }
+          });
+        }
+
+        // Lắng nghe event beforeitemshow - trigger NGAY khi bắt đầu transition
+        UIkit.util.on(sliderEl, "beforeitemshow", function (e) {
+          // e.target là slide mới sẽ được show
+          const slides = Array.from(
+            sliderEl.querySelectorAll(".uk-slider-items > div"),
+          );
+          const newCenterIndex = slides.indexOf(e.target);
+
+          if (newCenterIndex !== -1) {
+            updateSlidePositions(newCenterIndex);
+          }
+        });
+
+        // Khởi tạo positions khi load
+        // Đợi UIKit slider khởi tạo xong
+        UIkit.util.ready(function () {
+          setTimeout(function () {
+            const slider = UIkit.slider(sliderEl);
+            if (slider) {
+              updateSlidePositions(slider.index);
+            }
+          }, 100);
+        });
+      })();
+    </script>
+  </body>
+</html>

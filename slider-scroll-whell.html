@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mousewheel Slider - Pure HTML CSS JS</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 50%,
+          #0f3460 100%
+        );
+        min-height: 100vh;
+        padding: 40px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      h1 {
+        color: #fff;
+        text-align: center;
+        margin-bottom: 40px;
+        font-size: 2.5rem;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      h1 span {
+        background: linear-gradient(90deg, #00d9ff, #00ff88);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .slider-container {
+        width: 100%;
+        max-width: 1200px;
+        position: relative;
+      }
+
+      .slider-wrapper {
+        overflow: hidden;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        padding: 20px 0;
+      }
+
+      .slider-track {
+        display: flex;
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        will-change: transform;
+        transform: translateX(0);
+        /* Ensure starting position */
+      }
+
+      .slide {
+        flex-shrink: 0;
+        padding: 0 10px;
+      }
+
+      .slide-content {
+        background: linear-gradient(145deg, #2d2d4a 0%, #1e1e32 100%);
+        border-radius: 16px;
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow:
+          0 10px 40px rgba(0, 0, 0, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .slide-content::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #00d9ff, #00ff88);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .slide-content:hover {
+        transform: translateY(-8px);
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.4),
+          0 0 0 1px rgba(0, 217, 255, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      }
+
+      .slide-content:hover::before {
+        opacity: 1;
+      }
+
+      .slide-number {
+        font-size: 3rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00d9ff 0%, #00ff88 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Instruction text */
+      .instruction {
+        color: rgba(255, 255, 255, 0.6);
+        text-align: center;
+        margin-top: 30px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .instruction svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+
+        40% {
+          transform: translateY(-5px);
+        }
+
+        60% {
+          transform: translateY(-3px);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        .slide-content {
+          height: 150px;
+        }
+
+        .slide-number {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div style="height: 100vh; background-color: red"></div>
+    <h1>Mousewheel <span>Slider</span></h1>
+
+    <div class="section-slider">
+      <div class="slider-container">
+        <div class="slider-wrapper">
+          <div class="slider-track" id="sliderTrack">
+            <div class="slide">
+              <div class="slide-content">
+                <span class="slide-number">1</span>
+              </div>
+            </div>
+            <div class="slide">
+              <div class="slide-content">
+                <span class="slide-number">2</span>
+              </div>
+            </div>
+            <div class="slide">
+              <div class="slide-content">
+                <span class="slide-number">3</span>
+              </div>
+            </div>
+            <div class="slide">
+              <div class="slide-content">
+                <span class="slide-number">4</span>
+              </div>
+            </div>
+            <div class="slide">
+              <div class="slide-content">
+                <span class="slide-number">5</span>
+              </div>
+            </div>
+            <div class="slide">
+              <div class="slide-content">
+                <span class="slide-number">6</span>
+              </div>
+            </div>
+            <div class="slide">
+              <div class="slide-content">
+                <span class="slide-number">7</span>
+              </div>
+            </div>
+            <div class="slide">
+              <div class="slide-content">
+                <span class="slide-number">8</span>
+              </div>
+            </div>
+            <div class="slide">
+              <div class="slide-content">
+                <span class="slide-number">9</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="instruction">
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+        />
+      </svg>
+      Sử dụng con lăn chuột để cuộn slide
+    </p>
+
+    <div style="height: 100vh; background-color: red"></div>
+
+    <script>
+      class MousewheelSlider {
+        constructor(options = {}) {
+          // Responsive breakpoints: { breakpoint: itemsToShow }
+          this.responsive = options.responsive || {
+            0: 1,
+            600: 3,
+            960: 5,
+            1200: 6,
+          };
+
+          // Section selector for scroll hijacking
+          this.sectionSelector = options.sectionSelector || ".section-slider";
+          // Force complete: must scroll through all slides before page scroll
+          this.forceComplete =
+            options.forceComplete !== undefined ? options.forceComplete : false;
+
+          this.currentOffset = 0;
+          this.isAnimating = false;
+          this.wheelTimeout = null;
+          this.isActive = false; // Track if slider is in viewport center
+
+          this.section = document.querySelector(this.sectionSelector);
+          this.track = document.getElementById("sliderTrack");
+          this.slides = this.track.querySelectorAll(".slide");
+          this.totalSlides = this.slides.length;
+
+          this.init();
+        }
+
+        init() {
+          // Wait for next frame to ensure DOM is fully rendered
+          requestAnimationFrame(() => {
+            this.updateSlideWidth();
+            this.updatePosition(false);
+          });
+
+          // Also recalculate after all resources loaded
+          window.addEventListener("load", () => {
+            this.updateSlideWidth();
+            this.updatePosition(false);
+          });
+
+          this.bindEvents();
+        }
+
+        getItemsToShow() {
+          const width = window.innerWidth;
+          let items = 1;
+
+          const breakpoints = Object.keys(this.responsive)
+            .map(Number)
+            .sort((a, b) => a - b);
+
+          for (const bp of breakpoints) {
+            if (width >= bp) {
+              items = this.responsive[bp];
+            }
+          }
+
+          return items;
+        }
+
+        updateSlideWidth() {
+          const itemsToShow = this.getItemsToShow();
+          this.wrapperWidth =
+            document.querySelector(".slider-wrapper").offsetWidth;
+          const slideWidth = this.wrapperWidth / itemsToShow;
+
+          this.slides.forEach((slide) => {
+            slide.style.minWidth = `${slideWidth}px`;
+          });
+
+          this.slideWidth = slideWidth;
+          this.itemsToShow = itemsToShow;
+          this.trackWidth = this.slideWidth * this.totalSlides;
+          this.maxOffset = Math.max(0, this.trackWidth - this.wrapperWidth);
+        }
+
+        updatePosition(animate = true) {
+          if (animate) {
+            this.track.style.transition =
+              "transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+          } else {
+            this.track.style.transition = "none";
+          }
+
+          this.track.style.transform = `translateX(${-this.currentOffset}px)`;
+        }
+
+        next() {
+          if (this.isAnimating) return false;
+
+          // Calculate next offset
+          const nextOffset = this.currentOffset + this.slideWidth;
+
+          // No loop - stop at end (snap to max offset)
+          if (this.currentOffset < this.maxOffset) {
+            this.currentOffset = Math.min(nextOffset, this.maxOffset);
+            this.animateSlide();
+            return true;
+          }
+          return false;
+        }
+
+        prev() {
+          if (this.isAnimating) return false;
+
+          // Calculate prev offset
+          const prevOffset = this.currentOffset - this.slideWidth;
+
+          // No loop - stop at beginning
+          if (this.currentOffset > 0) {
+            this.currentOffset = Math.max(prevOffset, 0);
+            this.animateSlide();
+            return true;
+          }
+          return false;
+        }
+
+        animateSlide() {
+          this.isAnimating = true;
+          this.updatePosition(true);
+
+          setTimeout(() => {
+            this.isAnimating = false;
+          }, 400);
+        }
+
+        // Check if section is in viewport center
+        isSectionInCenter() {
+          if (!this.section) return false;
+
+          const rect = this.section.getBoundingClientRect();
+          const viewportHeight = window.innerHeight;
+          const sectionCenter = rect.top + rect.height / 2;
+          const viewportCenter = viewportHeight / 2;
+
+          // Section is considered "in center" if its center is within 40% of viewport center
+          const threshold = viewportHeight * 0.2;
+          return Math.abs(sectionCenter - viewportCenter) < threshold;
+        }
+
+        handleWheel(e) {
+          const scrollingDown = e.deltaY > 0;
+          const scrollingUp = e.deltaY < 0;
+          const isAtStart = this.currentOffset <= 0;
+          const isAtEnd = this.currentOffset >= this.maxOffset;
+
+          // Check if force complete mode is enabled
+          if (this.forceComplete) {
+            // Check if section is in viewport center
+            const inCenter = this.isSectionInCenter();
+
+            if (inCenter) {
+              // Slider is active - hijack scroll
+              this.isActive = true;
+
+              // If can still move in scroll direction, prevent page scroll
+              if (scrollingDown && !isAtEnd) {
+                e.preventDefault();
+                this.debounceNext(scrollingDown);
+                return;
+              }
+
+              if (scrollingUp && !isAtStart) {
+                e.preventDefault();
+                this.debouncePrev(scrollingUp);
+                return;
+              }
+
+              // At boundary - allow page scroll
+              this.isActive = false;
+              return;
+            } else {
+              // Section not in center - allow normal page scroll
+              this.isActive = false;
+              return;
+            }
+          } else {
+            // Original behavior - only works when hovering over slider-wrapper
+            if (!e.target.closest(".slider-wrapper")) return;
+
+            // Allow page scroll if at boundary
+            if ((isAtStart && scrollingUp) || (isAtEnd && scrollingDown)) {
+              return;
+            }
+
+            e.preventDefault();
+
+            if (this.wheelTimeout) {
+              clearTimeout(this.wheelTimeout);
+            }
+
+            this.wheelTimeout = setTimeout(() => {
+              if (scrollingDown) {
+                this.next();
+              } else if (scrollingUp) {
+                this.prev();
+              }
+            }, 50);
+          }
+        }
+
+        debounceNext() {
+          if (this.wheelTimeout) {
+            clearTimeout(this.wheelTimeout);
+          }
+          this.wheelTimeout = setTimeout(() => {
+            this.next();
+          }, 50);
+        }
+
+        debouncePrev() {
+          if (this.wheelTimeout) {
+            clearTimeout(this.wheelTimeout);
+          }
+          this.wheelTimeout = setTimeout(() => {
+            this.prev();
+          }, 50);
+        }
+
+        bindEvents() {
+          // Global wheel listener for forceComplete mode
+          if (this.forceComplete) {
+            window.addEventListener("wheel", (e) => this.handleWheel(e), {
+              passive: false,
+            });
+          } else {
+            // Original: only on slider-wrapper
+            document
+              .querySelector(".slider-wrapper")
+              .addEventListener("wheel", (e) => this.handleWheel(e), {
+                passive: false,
+              });
+          }
+
+          // Resize handler
+          let resizeTimeout;
+          window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+              this.updateSlideWidth();
+              this.updatePosition(false);
+            }, 100);
+          });
+
+          // Touch support
+          let touchStartX = 0;
+          let touchEndX = 0;
+
+          this.track.addEventListener(
+            "touchstart",
+            (e) => {
+              touchStartX = e.touches[0].clientX;
+            },
+            { passive: true },
+          );
+
+          this.track.addEventListener(
+            "touchend",
+            (e) => {
+              touchEndX = e.changedTouches[0].clientX;
+              const diff = touchStartX - touchEndX;
+
+              if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                  this.next();
+                } else {
+                  this.prev();
+                }
+              }
+            },
+            { passive: true },
+          );
+        }
+      }
+
+      // Initialize the slider
+      document.addEventListener("DOMContentLoaded", () => {
+        new MousewheelSlider({
+          responsive: {
+            0: 1.2,
+            600: 2.5,
+            960: 2.5,
+            1200: 2.5,
+          },
+          sectionSelector: ".section-slider",
+          forceComplete: true, // Enable scroll hijacking until slider is complete
+        });
+      });
+    </script>
+  </body>
+</html>
