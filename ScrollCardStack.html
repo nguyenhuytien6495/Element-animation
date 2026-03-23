@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style type="text/css">
+    .scsa {
+      position: relative;
+      width: 100vw;
+    }
+    .scsa__container {
+      position: sticky !important;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .scsa__stack {
+      position: relative !important;
+      width: 288px;
+      height: 383px;
+      margin: 0 auto;
+    }
+    .scsa__card {
+      position: absolute !important;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      border: 4px solid #fff;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 2rem;
+      transition: box-shadow 0.2s;
+    }
+    .scsa__heading {
+      position: absolute !important;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      text-align: center;
+      color: #000;
+      font-size: 42px;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+  <body>
+    <section>
+      <div class="scsa">
+        <div class="scsa__container">
+          <div class="scsa__stack" id="scsaStack">
+            <div class="scsa__card scsa__card--1" data-card-index="0">
+              <div>
+                <div class="scsa__card-icon">⏰</div>
+                <h3 class="scsa__card-title">
+                  Gift campaigns take forever to set up properly
+                </h3>
+                <p class="scsa__card-desc">
+                  Stop spending hours on complex configurations. Our AI-powered
+                  setup gets your gift campaigns running in minutes, not days.
+                </p>
+              </div>
+              <span class="scsa__card-number">Pain Point 01</span>
+            </div>
+            <div class="scsa__card scsa__card--2" data-card-index="1">
+              <div>
+                <div class="scsa__card-icon">🎯</div>
+                <h3 class="scsa__card-title">
+                  No clue which gift strategy actually converts
+                </h3>
+                <p class="scsa__card-desc">
+                  Data-driven insights show you exactly which gift offers drive
+                  the most conversions and revenue for your store.
+                </p>
+              </div>
+              <span class="scsa__card-number">Pain Point 02</span>
+            </div>
+            <div class="scsa__card scsa__card--3" data-card-index="2">
+              <div>
+                <div class="scsa__card-icon">💎</div>
+                <h3 class="scsa__card-title">
+                  Non-interactive widgets kill customer excitement
+                </h3>
+                <p class="scsa__card-desc">
+                  Engage customers with beautiful, interactive gift pickers that
+                  turn browsing into an exciting shopping experience.
+                </p>
+              </div>
+              <span class="scsa__card-number">Pain Point 03</span>
+            </div>
+            <div class="scsa__card scsa__card--4" data-card-index="3">
+              <div>
+                <div class="scsa__card-icon">🚀</div>
+                <h3 class="scsa__card-title">
+                  Scaling gift campaigns feels impossible
+                </h3>
+                <p class="scsa__card-desc">
+                  Automate everything from inventory sync to customer targeting.
+                  Scale your gift strategy as fast as your business grows.
+                </p>
+              </div>
+              <span class="scsa__card-number">Pain Point 04</span>
+            </div>
+          </div>
+          <div class="scsa__heading">
+            <h2>All your gift campaign headaches are finally over.</h2>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+  <script type="text/javascript">
+    /* --------------- Stacked Scroll Cards animation -------------- */
+    document.addEventListener("DOMContentLoaded", function () {
+      const section = document.querySelector(".scsa");
+      const container = document.querySelector(".scsa__container");
+      const cards = document.querySelectorAll(".scsa__card");
+      const text = document.querySelector(".scsa__heading");
+      // Góc nghiêng mặc định cho từng card, tự động sinh nếu số lượng card thay đổi
+      const defaultAngles = Array.from(
+        { length: cards.length },
+        (_, i) => 6 - i * 6,
+      );
+      const numCards = cards.length;
+      const totalItems = numCards + 1; // +1 cho text
+      let sectionHeight = totalItems * window.innerHeight;
+      section.style.height = `${totalItems * 100}vh`;
+
+      // Easing function
+      function easeInOut(t) {
+        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      }
+
+      // Lerp scroll value for smooth animation
+      let targetScroll = 0;
+      let currentScroll = 0;
+      const smoothing = 0.12; // càng nhỏ càng mượt
+
+      window.addEventListener("scroll", () => {
+        const sectionRect = section.getBoundingClientRect();
+        const vh = window.innerHeight;
+        targetScroll = Math.min(
+          Math.max(-sectionRect.top, 0),
+          sectionHeight - vh,
+        );
+      });
+      window.addEventListener("resize", () => {
+        sectionHeight = totalItems * window.innerHeight;
+        section.style.height = `${totalItems * 100}vh`;
+      });
+
+      function animate() {
+        // Nội suy giá trị scroll
+        currentScroll += (targetScroll - currentScroll) * smoothing;
+        // Nếu đã rất gần target, gán luôn để tránh lặp vô tận
+        if (Math.abs(targetScroll - currentScroll) < 0.1) {
+          currentScroll = targetScroll;
+        }
+
+        const vh = window.innerHeight;
+        // Tỉ lệ cuộn toàn section (0 -> 1)
+        const sectionProgress = currentScroll / (sectionHeight - vh);
+
+        cards.forEach((card, index) => {
+          // Delay nhỏ giữa các card
+          const delay = index * 0.08;
+          // Mỗi card chiếm 1 đoạn scroll riêng
+          const cardStart = index * vh;
+          const cardEnd = (index + 1) * vh;
+          let cardProgress = Math.min(
+            Math.max((currentScroll - cardStart) / vh, 0),
+            1,
+          );
+          // Áp dụng easing và delay
+          cardProgress = Math.min(
+            Math.max((cardProgress - delay) / (1 - delay), 0),
+            1,
+          );
+          const eased = easeInOut(cardProgress);
+          // Tính transform động
+          const angle = defaultAngles[index] + 50 * eased;
+          const translateY = -eased * vh;
+          card.style.transform = `translateY(${translateY}px) rotate(${angle}deg) scale(${1 - 0.05 * eased})`;
+          card.style.opacity = 1 - eased;
+          // Z-index động: card trên cùng có z-index cao nhất
+          card.style.zIndex = numCards - index + 1;
+        });
+        // Text chỉ hiện khi đã cuộn hết section (sau khi card cuối cùng đã bay lên)
+        // text.style.opacity = sectionProgress > (numCards / (numCards + 1)) ? 1 : 0;
+        text.style.zIndex = 1;
+
+        requestAnimationFrame(animate);
+      }
+      animate();
+    });
+
+    /* --------------- END!!! Stacked Scroll Cards animation -------------- */
+  </script>
+</html>
